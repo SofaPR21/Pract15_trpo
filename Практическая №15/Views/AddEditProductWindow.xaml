@@ -1,0 +1,275 @@
+﻿<Window x:Class="Практическая__15.Views.AddEditProductWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxml.net/winfx/xaml/themes"
+        xmlns:local="clr-namespace:Практическая__15.Views"
+        xmlns:validation="clr-namespace:Практическая__15.Validation"
+        mc:Ignorable="d"
+        Title="Добавление/Редактирование товара" 
+        Height="710" 
+        Width="550"
+        WindowStartupLocation="CenterOwner"
+        Background="#dfeaeb"
+        ResizeMode="NoResize">
+
+    <Window.Resources>
+
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" 
+                   Text="Информация о товаре" 
+                   FontSize="18" 
+                   FontWeight="Bold"
+                   HorizontalAlignment="Center"
+                   Margin="0,0,0,10"
+                   Foreground="#00c4b4"/>
+
+        <TextBlock Grid.Row="1" Text="Название товара" FontWeight="Bold" Margin="0,5"/>
+        <TextBox Grid.Row="2" 
+                 x:Name="txtName" 
+                 Height="30"
+                 Margin="0,0,0,5">
+            <TextBox.Text>
+                <Binding Path="ProductName" UpdateSourceTrigger="PropertyChanged" ValidatesOnDataErrors="True" NotifyOnValidationError="True">
+                    <Binding.ValidationRules>
+                        <validation:ProductNameValidationRule ValidatesOnTargetUpdated="True"/>
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
+        </TextBox>
+
+        <TextBlock Grid.Row="3" Text="Описание" FontWeight="Bold" Margin="0,10,0,5"/>
+        <TextBox Grid.Row="4" 
+                 x:Name="txtDescription" 
+                 TextWrapping="Wrap" 
+                 Height="30"
+                 AcceptsReturn="True"
+                 VerticalScrollBarVisibility="Auto"
+                 Margin="0,0,0,5">
+            <TextBox.Text>
+                <Binding Path="Description" UpdateSourceTrigger="PropertyChanged" ValidatesOnDataErrors="True" NotifyOnValidationError="True">
+                    <Binding.ValidationRules>
+                        <validation:ProductDescriptionValidationRule ValidatesOnTargetUpdated="True"/>
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
+        </TextBox>
+
+        <Grid Grid.Row="5" Margin="0,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="15"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" 
+                    Background="White" 
+                    CornerRadius="5" 
+                    Padding="10"
+                    BorderBrush="#E0E0E0"
+                    BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Цена ($)" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <TextBox x:Name="txtPrice" 
+                             Height="30"
+                             Margin="0,0,0,5">
+                        <TextBox.Text>
+                            <Binding Path="Price" UpdateSourceTrigger="PropertyChanged" ValidatesOnDataErrors="True" NotifyOnValidationError="True">
+                                <Binding.ValidationRules>
+                                    <validation:PriceValidationRule ValidatesOnTargetUpdated="True"/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2" 
+                    Background="White" 
+                    CornerRadius="5" 
+                    Padding="10"
+                    BorderBrush="#E0E0E0"
+                    BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Количество" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <TextBox x:Name="txtQuantity" 
+                             Height="30"
+                             Margin="0,0,0,5">
+                        <TextBox.Text>
+                            <Binding Path="Stock" UpdateSourceTrigger="PropertyChanged" ValidatesOnDataErrors="True" NotifyOnValidationError="True">
+                                <Binding.ValidationRules>
+                                    <validation:StockValidationRule ValidatesOnTargetUpdated="True"/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <TextBlock Grid.Row="6" Text="Рейтинг" FontWeight="Bold" Margin="0,5,0,5"/>
+        <ComboBox Grid.Row="7" 
+                  x:Name="cmbRating" 
+                  Height="35"
+                  SelectedIndex="6"
+                  Margin="0,0,0,5">
+            <ComboBoxItem Content="1.0" Tag="1.0"/>
+            <ComboBoxItem Content="1.1" Tag="1.1"/>
+            <ComboBoxItem Content="1.2" Tag="1.2"/>
+            <ComboBoxItem Content="1.3" Tag="1.3"/>
+            <ComboBoxItem Content="1.4" Tag="1.4"/>
+            <ComboBoxItem Content="1.5" Tag="1.5"/>
+            <ComboBoxItem Content="1.6" Tag="1.6"/>
+            <ComboBoxItem Content="1.7" Tag="1.7"/>
+            <ComboBoxItem Content="1.8" Tag="1.8"/>
+            <ComboBoxItem Content="1.9" Tag="1.9"/>
+            <ComboBoxItem Content="2.0" Tag="2.0"/>
+            <ComboBoxItem Content="2.1" Tag="2.1"/>
+            <ComboBoxItem Content="2.2" Tag="2.2"/>
+            <ComboBoxItem Content="2.3" Tag="2.3"/>
+            <ComboBoxItem Content="2.4" Tag="2.4"/>
+            <ComboBoxItem Content="2.5" Tag="2.5"/>
+            <ComboBoxItem Content="2.6" Tag="2.6"/>
+            <ComboBoxItem Content="2.7" Tag="2.7"/>
+            <ComboBoxItem Content="2.8" Tag="2.8"/>
+            <ComboBoxItem Content="2.9" Tag="2.9"/>
+            <ComboBoxItem Content="3.0" Tag="3.0"/>
+            <ComboBoxItem Content="3.1" Tag="3.1"/>
+            <ComboBoxItem Content="3.2" Tag="3.2"/>
+            <ComboBoxItem Content="3.3" Tag="3.3"/>
+            <ComboBoxItem Content="3.4" Tag="3.4"/>
+            <ComboBoxItem Content="3.5" Tag="3.5"/>
+            <ComboBoxItem Content="3.6" Tag="3.6"/>
+            <ComboBoxItem Content="3.7" Tag="3.7"/>
+            <ComboBoxItem Content="3.8" Tag="3.8"/>
+            <ComboBoxItem Content="3.9" Tag="3.9"/>
+            <ComboBoxItem Content="4.0" Tag="4.0"/>
+            <ComboBoxItem Content="4.1" Tag="4.1"/>
+            <ComboBoxItem Content="4.2" Tag="4.2"/>
+            <ComboBoxItem Content="4.3" Tag="4.3"/>
+            <ComboBoxItem Content="4.4" Tag="4.4"/>
+            <ComboBoxItem Content="4.5" Tag="4.5"/>
+            <ComboBoxItem Content="4.6" Tag="4.6"/>
+            <ComboBoxItem Content="4.7" Tag="4.7"/>
+            <ComboBoxItem Content="4.8" Tag="4.8"/>
+            <ComboBoxItem Content="4.9" Tag="4.9"/>
+            <ComboBoxItem Content="5.0" Tag="5.0"/>
+        </ComboBox>
+
+        <Grid Grid.Row="8" Margin="0,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="15"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" 
+                    Background="White" 
+                    CornerRadius="5" 
+                    Padding="10"
+                    BorderBrush="#E0E0E0"
+                    BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Категория" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <ComboBox x:Name="cmbCategory" 
+                              DisplayMemberPath="Name"
+                              SelectedValuePath="Id"
+                              Height="30">
+                        <ComboBox.SelectedValue>
+                            <Binding Path="CategoryId" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" ValidatesOnDataErrors="True" NotifyOnValidationError="True">
+                                <Binding.ValidationRules>
+                                    <validation:RequiredIdValidationRule FieldName="Категорию" ValidatesOnTargetUpdated="True"/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </ComboBox.SelectedValue>
+                    </ComboBox>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2" 
+                    Background="White" 
+                    CornerRadius="5" 
+                    Padding="10"
+                    BorderBrush="#E0E0E0"
+                    BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Бренд" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <ComboBox x:Name="cmbBrand" 
+                              DisplayMemberPath="Name"
+                              SelectedValuePath="Id"
+                              Height="30">
+                        <ComboBox.SelectedValue>
+                            <Binding Path="SelectedBrandId" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" ValidatesOnDataErrors="True" NotifyOnValidationError="True">
+                                <Binding.ValidationRules>
+                                    <validation:RequiredIdValidationRule FieldName="Бренд" ValidatesOnTargetUpdated="True"/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </ComboBox.SelectedValue>
+                    </ComboBox>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <TextBlock Grid.Row="9" Text="Теги (можно выбрать несколько)" FontWeight="Bold" Margin="0,10,0,5"/>
+        <ScrollViewer Grid.Row="10" 
+                      MaxHeight="120"
+                      VerticalScrollBarVisibility="Auto"
+                      Margin="0,0,0,10">
+            <ItemsControl x:Name="TagsItemsControl">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox Margin="5,3" 
+                                  Content="{Binding Name}"
+                                  Tag="{Binding Id}"
+                                  IsChecked="{Binding IsSelected}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="11" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Center" 
+                    Margin="0,5,0,0">
+            <Button Content="Отмена" 
+                    Click="Cancel_Click" 
+                    Width="100" 
+                    Height="35"
+                    Margin="5"
+                    Background="#E0E0E0"
+                    Foreground="#333333"
+                    FontWeight="Bold"/>
+            <Button Content="Сохранить" 
+                    Click="Save_Click" 
+                    Width="110" 
+                    Height="35"
+                    Margin="5"
+                    Background="#00c4b4" 
+                    Foreground="White"
+                    FontWeight="Bold"/>
+        </StackPanel>
+    </Grid>
+</Window>
