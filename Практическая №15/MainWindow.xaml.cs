@@ -1,9 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Collections;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -13,6 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Практическая__15.Models;
 using Практическая__15.Services;
+using Практическая__15.Validation;
 using Практическая__15.Views;
 
 namespace Практическая__15
@@ -20,16 +24,148 @@ namespace Практическая__15
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged, INotifyDataErrorInfo
     {
         private readonly ElectronicsStoreBaseContext _context;
+        private Dictionary<string, List<string>> _errors = new Dictionary<string, List<string>>();
 
         public ObservableCollection<Product> Products { get; set; } = new();
         public ICollectionView ProductsView { get; set; }
 
         private string _searchQuery = string.Empty;
+        private string _priceFrom;
+        private string _priceTo;
+
+        public string PriceFrom
+        {
+            get => _priceFrom;
+            set
+            {
+                if (_priceFrom != value)
+                {
+                    _priceFrom = value;
+                    OnPropertyChanged();
+                    ValidatePriceFrom();
+                    ValidatePriceRange();
+                    ProductsView?.Refresh();
+                }
+            }
+        }
+
+        public string PriceTo
+        {
+            get => _priceTo;
+            set
+            {
+                if (_priceTo != value)
+                {
+                    _priceTo = value;
+                    OnPropertyChanged();
+                    ValidatePriceTo();
+                    ValidatePriceRange();
+                    ProductsView?.Refresh();
+                }
+            }
+        }
 
         public string UserRole { get; }
+
+        private void ValidatePriceFrom()
+        {
+            ClearErrors(nameof(PriceFrom));
+
+            if (string.IsNullOrWhiteSpace(PriceFrom))
+                return;
+
+            var validator = new PriceRangeValidationRule();
+            var result = validator.Validate(PriceFrom, CultureInfo.CurrentCulture);
+
+            if (!result.IsValid)
+            {
+                AddError(nameof(PriceFrom), result.ErrorContent.ToString());
+            }
+        }
+
+        private void ValidatePriceTo()
+        {
+            ClearErrors(nameof(PriceTo));
+
+            if (string.IsNullOrWhiteSpace(PriceTo))
+                return;
+
+            var validator = new PriceRangeValidationRule();
+            var result = validator.Validate(PriceTo, CultureInfo.CurrentCulture);
+
+            if (!result.IsValid)
+            {
+                AddError(nameof(PriceTo), result.ErrorContent.ToString());
+            }
+        }
+
+        private void ValidatePriceRange()
+        {
+            ClearErrors("PriceRange");
+
+            if (string.IsNullOrWhiteSpace(PriceFrom) || string.IsNullOrWhiteSpace(PriceTo))
+                return;
+
+            if (!decimal.TryParse(PriceFrom.Replace(',', '.'),
+                NumberStyles.Any, CultureInfo.InvariantCulture, out decimal from))
+                return;
+
+            if (!decimal.TryParse(PriceTo.Replace(',', '.'),
+                NumberStyles.Any, CultureInfo.InvariantCulture, out decimal to))
+                return;
+
+            if (from > to)
+            {
+                string error = $"Цена 'от' ({from}) не может быть больше цены 'до' ({to})";
+                AddError(nameof(PriceFrom), error);
+                AddError(nameof(PriceTo), error);
+                AddError("PriceRange", error);
+            }
+        }
+
+        public bool HasErrors => _errors.Any();
+
+        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
+
+        public IEnumerable GetErrors(string propertyName) 
+        {
+            if (string.IsNullOrEmpty(propertyName))
+                return _errors.SelectMany(e => e.Value).ToList();
+
+            return _errors.ContainsKey(propertyName) ? _errors[propertyName] : null;
+        }
+
+        private void AddError(string propertyName, string error)
+        {
+            if (!_errors.ContainsKey(propertyName))
+                _errors[propertyName] = new List<string>();
+
+            if (!_errors[propertyName].Contains(error))
+            {
+                _errors[propertyName].Add(error);
+                ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+            }
+        }
+
+        private void ClearErrors(string propertyName)
+        {
+            if (_errors.ContainsKey(propertyName))
+            {
+                _errors.Remove(propertyName);
+                ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         public MainWindow(string role)
         {
             UserRole = role;
@@ -95,17 +231,19 @@ namespace Практическая__15
                 !product.Name.Contains(_searchQuery, StringComparison.CurrentCultureIgnoreCase))
                 return false;
 
-            if (!string.IsNullOrWhiteSpace(txtPriceFrom.Text))
+            if (!string.IsNullOrWhiteSpace(PriceFrom))
             {
-                if (decimal.TryParse(txtPriceFrom.Text, out decimal priceFrom))
+                if (decimal.TryParse(PriceFrom.Replace(',', '.'),
+                    NumberStyles.Any, CultureInfo.InvariantCulture, out decimal priceFrom))
                 {
                     if (product.Price < priceFrom) return false;
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(txtPriceTo.Text))
+            if (!string.IsNullOrWhiteSpace(PriceTo))
             {
-                if (decimal.TryParse(txtPriceTo.Text, out decimal priceTo))
+                if (decimal.TryParse(PriceTo.Replace(',', '.'),
+                    NumberStyles.Any, CultureInfo.InvariantCulture, out decimal priceTo))
                 {
                     if (product.Price > priceTo) return false;
                 }
@@ -164,12 +302,6 @@ namespace Практическая__15
             _searchQuery = txtSearch.Text;
             ProductsView?.Refresh();
         }
-
-        private void PriceFilter_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            ProductsView?.Refresh();
-        }
-
         private void CategoryFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ProductsView?.Refresh();
@@ -177,23 +309,15 @@ namespace Практическая__15
 
         private void BrandFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (cmbBrand.SelectedItem is Brand selectedBrand)
-            {
-                System.Diagnostics.Debug.WriteLine($"Выбран бренд: {selectedBrand.Name}, ID: {selectedBrand.Id}");
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("Бренд не выбран");
-            }
-
             ProductsView?.Refresh();
         }
 
         private void ResetFilters_Click(object sender, RoutedEventArgs e)
         {
             txtSearch.Text = string.Empty;
-            txtPriceFrom.Text = string.Empty;
-            txtPriceTo.Text = string.Empty;
+            _searchQuery = string.Empty;
+            PriceFrom = string.Empty;
+            PriceTo = string.Empty;
             cmbCategory.SelectedItem = null;
             cmbBrand.SelectedItem = null;
 
@@ -203,8 +327,8 @@ namespace Практическая__15
             }
 
             ProductsView?.SortDescriptions.Clear();
+
             ProductsView?.Refresh();
-            ProductsListView.Items.Refresh();
         }
 
         private void SortComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
