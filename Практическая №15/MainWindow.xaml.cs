@@ -95,15 +95,21 @@ namespace Практическая__15
                 !product.Name.Contains(_searchQuery, StringComparison.CurrentCultureIgnoreCase))
                 return false;
 
-            if (!string.IsNullOrWhiteSpace(txtPriceFrom.Text) &&
-                decimal.TryParse(txtPriceFrom.Text, out decimal priceFrom) &&
-                product.Price < priceFrom)
-                return false;
+            if (!string.IsNullOrWhiteSpace(txtPriceFrom.Text))
+            {
+                if (decimal.TryParse(txtPriceFrom.Text, out decimal priceFrom))
+                {
+                    if (product.Price < priceFrom) return false;
+                }
+            }
 
-            if (!string.IsNullOrWhiteSpace(txtPriceTo.Text) &&
-                decimal.TryParse(txtPriceTo.Text, out decimal priceTo) &&
-                product.Price > priceTo)
-                return false;
+            if (!string.IsNullOrWhiteSpace(txtPriceTo.Text))
+            {
+                if (decimal.TryParse(txtPriceTo.Text, out decimal priceTo))
+                {
+                    if (product.Price > priceTo) return false;
+                }
+            }
 
             if (cmbCategory.SelectedItem is Category selectedCategory &&
                 product.CategoryId != selectedCategory.Id)
@@ -171,6 +177,15 @@ namespace Практическая__15
 
         private void BrandFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (cmbBrand.SelectedItem is Brand selectedBrand)
+            {
+                System.Diagnostics.Debug.WriteLine($"Выбран бренд: {selectedBrand.Name}, ID: {selectedBrand.Id}");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Бренд не выбран");
+            }
+
             ProductsView?.Refresh();
         }
 
@@ -182,7 +197,14 @@ namespace Практическая__15
             cmbCategory.SelectedItem = null;
             cmbBrand.SelectedItem = null;
 
+            if (cmbSort.SelectedIndex != -1)
+            {
+                cmbSort.SelectedIndex = -1;
+            }
+
+            ProductsView?.SortDescriptions.Clear();
             ProductsView?.Refresh();
+            ProductsListView.Items.Refresh();
         }
 
         private void SortComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -206,10 +228,10 @@ namespace Практическая__15
                     case "PriceDesc":
                         ProductsView.SortDescriptions.Add(new SortDescription("Price", ListSortDirection.Descending));
                         break;
-                    case "QuantityAsc":
+                    case "StockAsc":  
                         ProductsView.SortDescriptions.Add(new SortDescription("Stock", ListSortDirection.Ascending));
                         break;
-                    case "QuantityDesc":
+                    case "StockDesc":
                         ProductsView.SortDescriptions.Add(new SortDescription("Stock", ListSortDirection.Descending));
                         break;
                 }
